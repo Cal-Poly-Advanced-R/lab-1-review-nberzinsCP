@@ -8,35 +8,30 @@ library(here)
 library(tidyverse)
 ```
 
-**Checking Normality**  
-```{r dataset}
-OscarsDemo = read.csv(here('Oscars-demographics-DFE.csv'))
-```
-
-In this section, you will use a **Q-Q Plot** to check if a vector of values `x` comes from a Normal distribution.  
-The approach is to randomly generate a new vector `y` from a Normal distribution with the same mean and standard deviation as `x`, 
-then to create a Q-Q plot of `x` and `y`.
-*(Note: A typical Normal Q-Q plot uses theoretical quantiles instead of randomly generated values.  We're taking a bit of a shortcut
-in this assignment.)*
-
+##Part One
 ```{r}
-#x is the year_of_award variable
-x = OscarsDemo$year_of_award
-len_x = length(x)
-mean_x = mean(x)
-sd_x = sd(x)
+qq_func <- function(vec) {
+  #sort the vector in decreasing order
+  x = sort(vec, decreasing = T)
+  mean_x = mean(x)
+  sd_x = sd(x)
+  len_x = length(x)
+  
+  #create and sort a normal random vector of equal length, mean, and sd as x
+  y = sort(rnorm(len_x, mean_x, sd_x), decreasing = T)
+  
+  #return qqplot
+  return(plot(x, y, main = 'QQ-plot of x'))
+  
+}
 
-#y is a randomly generated vector of equal length as x, with a mean and sd identical to x.
-y = rnorm(len_x, mean_x, sd_x)
+#Using real data
+qq_func(OscarsDemo$year_of_award)
 
-#sort in decreasing order
-x = sort(x, decreasing = T)
-y = sort(y, decreasing = T)
-
-plot(x,y, main = 'QQ-plot for x')
-abline(0,1)
-
+#Using simulated data
+qq_func(rgamma(441, shape = 2, scale = 15))
 ```
+
 
 
 
