@@ -1,0 +1,18 @@
+---
+title: "Part 2"
+output: html_document
+date: "2023-04-06"
+---
+## Data
+```{r}
+OscarsDemo = read.csv(here("Oscars-demographics-DFE.csv"))
+```
+
+1. Which movie(s) won the most unique "Big 5" awards?
+```{r}
+
+```
+
+2. Of all actresses who have won the Best Actress award, what are is the most common first name?  
+
+3. What US State, or non-US country, has produced the most Oscar winners (for the awards in this dataset)?
