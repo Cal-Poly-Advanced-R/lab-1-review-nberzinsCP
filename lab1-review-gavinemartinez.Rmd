@@ -13,32 +13,31 @@ library(tidyverse)
 OscarsDemo = read.csv(here('Oscars-demographics-DFE.csv'))
 ```
 
-A Q-Q (Quantile-Quantile) Plot is a way of checking if two collections of observations come from the same distribution.
-
-The steps are as follows:
-
-1. Take two vectors of the same length, `x` and `y`.
-```{r}
-x = 
-```
-
-
-2. Put the vectors in order from largest to smallest.
-
-3. Pair the ordered vectors up, so that the smallest value of `x` is paired with the smallest value of `y`, and so on.
-
-4. Make a scatterplot of the ordered pairs.  
-
-
-If the points in the scatterplot fall on a straight line, with intercept 0 and slope 1, 
-this suggests that `x` and `y` are sampled from the same distribution.
-
-
 In this section, you will use a **Q-Q Plot** to check if a vector of values `x` comes from a Normal distribution.  
 The approach is to randomly generate a new vector `y` from a Normal distribution with the same mean and standard deviation as `x`, 
 then to create a Q-Q plot of `x` and `y`.
 *(Note: A typical Normal Q-Q plot uses theoretical quantiles instead of randomly generated values.  We're taking a bit of a shortcut
 in this assignment.)*
+
+```{r}
+#x is the year_of_award variable
+x = OscarsDemo$year_of_award
+len_x = length(x)
+mean_x = mean(x)
+sd_x = sd(x)
+
+#y is a randomly generated vector of equal length as x, with a mean and sd identical to x.
+y = rnorm(len_x, mean_x, sd_x)
+
+#sort in decreasing order
+x = sort(x, decreasing = T)
+y = sort(y, decreasing = T)
+
+plot(x,y, main = 'QQ-plot for x')
+abline(0,1)
+
+```
+
 
 
 
