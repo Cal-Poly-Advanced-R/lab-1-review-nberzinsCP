@@ -6,13 +6,13 @@ output: html_document
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(warning = FALSE, message = FALSE) 
 library(tidyverse)
 ```
 
-```{r qqplot function}
-qqcreate <- function(x) {
-  normalized_vals <- sort(rnorm(length(x), mean = mean(x), sd = sd(x))) 
+```{r qqplot function in tidy}
+qqcreatetidy <- function(x) {
+  normalized_values <- sort(rnorm(length(x), mean = mean(x), sd = sd(x))) 
   # Create a sorted vector of random normally distributed values with the mean and sd of the inputted vector
   vector <- sort(x)
   df <- data.frame(vector, normalized_values)
@@ -23,8 +23,21 @@ qqcreate <- function(x) {
     geom_point() +
     geom_abline(intercept = 0, slope = 1) +
     ggtitle("qqplot")
-  #Create a scatterplot with a line y = x. 
+  # Create a scatterplot with a line y = x. 
   
+  return(plt)
+}
+```
+
+```{r qqplot function in base}
+qqcreatebase <- function(x) {
+  normalized_values <- sort(rnorm(length(x), mean = mean(x), sd = sd(x))) 
+  vector <- sort(x)
+  
+  plt <- plot(vector, normalized_values)
+  abline(a = 0, b = 1)
+  # add a y = x line
+  title("qqplot")
   return(plt)
 }
 ```
@@ -34,7 +47,7 @@ df_oscars <- read_csv(here::here("Oscars-demographics-DFE.csv"))
 head(df_oscars)
 ```
 
-```{r}
+```{r warmup 1 tidy}
 df_oscars %>% 
   filter(award %in% c("Best Director", 
                        "Best Actor", 
@@ -46,7 +59,8 @@ df_oscars %>%
   filter(unique == max(unique))
 ```
 
-```{r}
+
+```{r warmup 2 tidy}
 df_oscars %>%
   filter(award == "Best Actress") %>%
   mutate(first_name = sub(" .*", "", person)) %>%
@@ -54,13 +68,56 @@ df_oscars %>%
   filter(n == max(n))
 ```
 
-```{r}
+```{r warmup 3 tidy}
 df_oscars %>% 
   mutate(birthplace = ifelse(birthplace=="New York City", "Ny", birthplace),
          region = sub(".*, ", "", birthplace)) %>%
   count(region) %>%
   filter(n == max(n))
 ```
+
+```{r age and gender data cleaning}
+library(lubridate)   
+df_oscars <- df_oscars %>%
+  mutate(award_date = as.Date(paste(as.character(year_of_award), "-02-01", sep = "")), 
+         date_of_birth = as.Date(date_of_birth, "%d-%b-%Y"), 
+         date_of_birth = update(date_of_birth, year = as.numeric(format(date_of_birth, "%Y")) + 
+                                ifelse(as.numeric(format(date_of_birth, "%Y")) < 99, 1900, 0)),
+         age = floor(time_length(difftime(award_date, date_of_birth), "years")), 
+         years_since_inception = year_of_award - 1927)
+```
+
+```{r malelm}
+df_males <- df_oscars %>%
+  filter(award %in% c("Best Actor", "Best Supporting Actor")) 
+
+lm_male <- lm(age ~ years_since_inception, data = df_males)
+summary(lm_male)
+```
+For male actors, our linear model is:
+$$
+\hat{age}=43.47876+0.07471(year)
+$$
+where year is in years after the inception of the Oscars. With a p-value of 0.05551, we can conclude that there is moderate evidence to support that there is a relationship between years after inception and age for male award winners. This means that for every 1 year past inception, the predicted age of Best Actor and Best Supporting Actor winners will go up by 0.07471 years. 
+
+```{r femalelm}
+df_females <- df_oscars %>%
+  filter(award %in% c("Best Actress", "Best Supporting Actress")) 
+
+lm_female <- lm(age ~ years_since_inception, data = df_females)
+summary(lm_female)
+```
+
+For female actors, our linear model is:
+$$
+\hat{age}=35.88847+0.03270(year)
+$$
+where year is in years after the inception of the Oscars. With a p-value of 0.4011, we can conclude that there is very weak evidence to suggest 
+is a relationship between years after inception and age for female award winners. However, if a relationship did exist between typical age and years since inception, we can conclude that for every 1 year past inception, the predicted age of Best Actress and Best Supporting Actress winners will go up by 0.03270 years. 
+
+
+
+
 
 
 
