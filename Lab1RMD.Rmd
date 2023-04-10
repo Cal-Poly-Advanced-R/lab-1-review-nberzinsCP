@@ -76,6 +76,37 @@ df_oscars %>%
   filter(n == max(n))
 ```
 
+
+```{r warmup 1 base}
+oscars_filtered <- df_oscars[df_oscars$award %in% c("Best Director", 
+                                                    "Best Actor",
+                                                    "Best Actress",
+                                                    "Best Supporting Actor",
+                                                    "Best Supporting Actress"),]
+
+oscars_grouped <- aggregate(award ~ movie, data = oscars_filtered, FUN = function(x) length(unique(x)))
+
+oscars_grouped[oscars_grouped$award == max(oscars_grouped$award), ]
+```
+
+
+```{r warmup 2 base}
+
+oscars_actress <- subset(df_oscars, award == "Best Actress")
+oscars_actress$first_name <- sub(" .*", "", oscars_actress$person)
+num_name <- table(oscars_actress$first_name)
+max_name <- max(num_name)
+subset(as.data.frame(num_name), Freq == max_name)
+```
+
+```{r warmup 3 base}
+df_oscars$birthplace <- ifelse(df_oscars$birthplace == "New York City", "Ny", df_oscars$birthplace)
+df_oscars$region <- sub(".*, ", "", df_oscars$birthplace)
+region_counts <- table(df_oscars$region)
+max_region <- names(region_counts)[region_counts == max(region_counts)]
+data.frame(region = max_region, n = max(region_counts))
+```
+
 ```{r age and gender data cleaning}
 library(lubridate)   
 df_oscars <- df_oscars %>%
