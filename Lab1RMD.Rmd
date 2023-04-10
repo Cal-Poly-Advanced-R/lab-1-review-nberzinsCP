@@ -1,6 +1,6 @@
 ---
 title: "Lab1RMD"
-author: "Brandon Kim"
+author: "Brandon Kim, Shreya Ravilla"
 date: '2023-04-06'
 output: html_document
 ---
@@ -9,6 +9,7 @@ output: html_document
 knitr::opts_chunk$set(warning = FALSE, message = FALSE) 
 library(tidyverse)
 ```
+
 
 ```{r qqplot function in tidy}
 qqcreatetidy <- function(x) {
@@ -29,6 +30,7 @@ qqcreatetidy <- function(x) {
 }
 ```
 
+
 ```{r qqplot function in base}
 qqcreatebase <- function(x) {
   normalized_values <- sort(rnorm(length(x), mean = mean(x), sd = sd(x))) 
@@ -42,10 +44,12 @@ qqcreatebase <- function(x) {
 }
 ```
 
+
 ```{r readcsv}
 df_oscars <- read_csv(here::here("Oscars-demographics-DFE.csv"))
 head(df_oscars)
 ```
+
 
 ```{r warmup 1 tidy}
 df_oscars %>% 
@@ -57,23 +61,6 @@ df_oscars %>%
   group_by(movie) %>%
   summarise(unique = nlevels(factor(award))) %>%
   filter(unique == max(unique))
-```
-
-
-```{r warmup 2 tidy}
-df_oscars %>%
-  filter(award == "Best Actress") %>%
-  mutate(first_name = sub(" .*", "", person)) %>%
-  count(first_name) %>%
-  filter(n == max(n))
-```
-
-```{r warmup 3 tidy}
-df_oscars %>% 
-  mutate(birthplace = ifelse(birthplace=="New York City", "Ny", birthplace),
-         region = sub(".*, ", "", birthplace)) %>%
-  count(region) %>%
-  filter(n == max(n))
 ```
 
 
@@ -90,6 +77,15 @@ oscars_grouped[oscars_grouped$award == max(oscars_grouped$award), ]
 ```
 
 
+```{r warmup 2 tidy}
+df_oscars %>%
+  filter(award == "Best Actress") %>%
+  mutate(first_name = sub(" .*", "", person)) %>%
+  count(first_name) %>%
+  filter(n == max(n))
+```
+
+
 ```{r warmup 2 base}
 
 oscars_actress <- subset(df_oscars, award == "Best Actress")
@@ -99,6 +95,15 @@ max_name <- max(num_name)
 subset(as.data.frame(num_name), Freq == max_name)
 ```
 
+```{r warmup 3 tidy}
+df_oscars %>% 
+  mutate(birthplace = ifelse(birthplace=="New York City", "Ny", birthplace),
+         region = sub(".*, ", "", birthplace)) %>%
+  count(region) %>%
+  filter(n == max(n))
+```
+
+
 ```{r warmup 3 base}
 df_oscars$birthplace <- ifelse(df_oscars$birthplace == "New York City", "Ny", df_oscars$birthplace)
 df_oscars$region <- sub(".*, ", "", df_oscars$birthplace)
@@ -106,6 +111,7 @@ region_counts <- table(df_oscars$region)
 max_region <- names(region_counts)[region_counts == max(region_counts)]
 data.frame(region = max_region, n = max(region_counts))
 ```
+
 
 ```{r age and gender data cleaning}
 library(lubridate)   
@@ -117,6 +123,7 @@ df_oscars <- df_oscars %>%
          age = floor(time_length(difftime(award_date, date_of_birth), "years")), 
          years_since_inception = year_of_award - 1927)
 ```
+
 
 ```{r malelm}
 df_males <- df_oscars %>%
@@ -130,6 +137,7 @@ $$
 \hat{age}=43.47876+0.07471(year)
 $$
 where year is in years after the inception of the Oscars. With a p-value of 0.05551, we can conclude that there is moderate evidence to support that there is a relationship between years after inception and age for male award winners. This means that for every 1 year past inception, the predicted age of Best Actor and Best Supporting Actor winners will go up by 0.07471 years. 
+
 
 ```{r femalelm}
 df_females <- df_oscars %>%
