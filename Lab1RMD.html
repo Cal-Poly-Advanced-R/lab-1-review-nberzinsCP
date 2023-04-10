@@ -9,7 +9,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
 
 
-<meta name="author" content="Brandon Kim" />
+<meta name="author" content="Brandon Kim, Shreya Ravilla" />
 
 <meta name="date" content="2023-04-06" />
 
@@ -360,7 +360,7 @@ pre code {
 
 
 <h1 class="title toc-ignore">Lab1RMD</h1>
-<h4 class="author">Brandon Kim</h4>
+<h4 class="author">Brandon Kim, Shreya Ravilla</h4>
 <h4 class="date">2023-04-06</h4>
 
 </div>
@@ -436,6 +436,30 @@ head(df_oscars)</code></pre>
 ## 12 Terms of Endearment              3
 ## 13 The Best Years of Our Lives      3
 ## 14 West Side Story                  3</code></pre>
+<pre class="r"><code>oscars_filtered &lt;- df_oscars[df_oscars$award %in% c(&quot;Best Director&quot;, 
+                                                    &quot;Best Actor&quot;,
+                                                    &quot;Best Actress&quot;,
+                                                    &quot;Best Supporting Actor&quot;,
+                                                    &quot;Best Supporting Actress&quot;),]
+
+oscars_grouped &lt;- aggregate(award ~ movie, data = oscars_filtered, FUN = function(x) length(unique(x)))
+
+oscars_grouped[oscars_grouped$award == max(oscars_grouped$award), ]</code></pre>
+<pre><code>##                           movie award
+## 13     A Streetcar Named Desire     3
+## 53                      Cabaret     3
+## 91        From Here to Eternity     3
+## 102                Going My Way     3
+## 103          Gone with the Wind     3
+## 122       It Happened One Night     3
+## 134           Kramer vs. Kramer     3
+## 153         Million Dollar Baby     3
+## 163                Mrs. Miniver     3
+## 170                     Network     3
+## 176           On the Waterfront     3
+## 223         Terms of Endearment     3
+## 233 The Best Years of Our Lives     3
+## 330             West Side Story     3</code></pre>
 <pre class="r"><code>df_oscars %&gt;%
   filter(award == &quot;Best Actress&quot;) %&gt;%
   mutate(first_name = sub(&quot; .*&quot;, &quot;&quot;, person)) %&gt;%
@@ -446,6 +470,14 @@ head(df_oscars)</code></pre>
 ##   &lt;chr&gt;      &lt;int&gt;
 ## 1 Hilary         4
 ## 2 Katharine      4</code></pre>
+<pre class="r"><code>oscars_actress &lt;- subset(df_oscars, award == &quot;Best Actress&quot;)
+oscars_actress$first_name &lt;- sub(&quot; .*&quot;, &quot;&quot;, oscars_actress$person)
+num_name &lt;- table(oscars_actress$first_name)
+max_name &lt;- max(num_name)
+subset(as.data.frame(num_name), Freq == max_name)</code></pre>
+<pre><code>##         Var1 Freq
+## 24    Hilary    4
+## 38 Katharine    4</code></pre>
 <pre class="r"><code>df_oscars %&gt;% 
   mutate(birthplace = ifelse(birthplace==&quot;New York City&quot;, &quot;Ny&quot;, birthplace),
          region = sub(&quot;.*, &quot;, &quot;&quot;, birthplace)) %&gt;%
@@ -455,6 +487,13 @@ head(df_oscars)</code></pre>
 ##   region     n
 ##   &lt;chr&gt;  &lt;int&gt;
 ## 1 Ny        64</code></pre>
+<pre class="r"><code>df_oscars$birthplace &lt;- ifelse(df_oscars$birthplace == &quot;New York City&quot;, &quot;Ny&quot;, df_oscars$birthplace)
+df_oscars$region &lt;- sub(&quot;.*, &quot;, &quot;&quot;, df_oscars$birthplace)
+region_counts &lt;- table(df_oscars$region)
+max_region &lt;- names(region_counts)[region_counts == max(region_counts)]
+data.frame(region = max_region, n = max(region_counts))</code></pre>
+<pre><code>##   region  n
+## 1     Ny 64</code></pre>
 <pre class="r"><code>library(lubridate)   
 df_oscars &lt;- df_oscars %&gt;%
   mutate(award_date = as.Date(paste(as.character(year_of_award), &quot;-02-01&quot;, sep = &quot;&quot;)), 
