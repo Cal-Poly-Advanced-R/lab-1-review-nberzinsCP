@@ -1,0 +1,44 @@
+---
+title: "part2_BootSTrapping"
+output: html_document
+date: "2023-04-11"
+---
+##Data
+```{r}
+library(here)
+OscarsDemo = read.csv(here("Oscars-demographics-DFE.csv"))
+```
+
+
+## Bootstrapping
+```{r}
+library(dplyr)
+library(ggplot2)
+
+prop_obs <- mean(OscarsDemo$race_ethnicity != "White")
+prop_obs
+
+B <- 1000
+
+prop_sim <- numeric(B)
+
+for (i in 1:B) {
+  sim_sample <- sample_n(OscarsDemo, size = nrow(OscarsDemo), replace = TRUE)
+  prop_sim[i] <- mean(sim_sample$race_ethnicity != "White")
+}
+
+ci_lower <- quantile(prop_sim, 0.025)
+ci_upper <- quantile(prop_sim, 0.975)
+ci_lower
+ci_upper
+
+# plot histogram of simulated proportions
+ggplot(data.frame(prop_sim), aes(x = prop_sim)) +
+  geom_histogram(binwidth = 0.005, fill = "lightblue", color = "black") +
+  geom_vline(xintercept = prop_obs, color = "red", size = 1) +
+  geom_vline(xintercept = ci_lower, color = "blue", size = 1) +
+  geom_vline(xintercept = ci_upper, color = "blue", size = 1) +
+  scale_x_continuous("Proportion of Non-White Winners", limits = c(0.0, 0.15), expand = c(0,0)) +
+  scale_y_continuous("Count", expand = c(0,0)) +
+  ggtitle("Distribution of Simulated Proportions\nwith 95% CI and Observed Proportion Highlighted") 
+```
