@@ -1,0 +1,46 @@
+---
+title: "Untitled"
+format: html
+editor: visual
+---
+
+
+```{r}
+library(tidyverse)
+library(purrr)
+library(readr)
+```
+
+
+##Question 1
+```{r Q-Q Plot Function - Tidy}
+#X and Y numeric vectors, must be of same length
+QQPlot_func <- function(x, y) {
+  stopifnot(is.numeric(x) & 
+              is.numeric(y) & 
+              length(x) == length(y)) #checking if vectors are numeric and same length
+  
+  df_sort <- data.frame(sort(x), sort(y)) #sorting the vectors from smallest to largest
+
+  qq_plot <- df_sort |> #creating qqplot
+    ggplot(aes(x = sort.x., sort.y.)) +
+    geom_point() +
+    labs(title = "Q-Q Plot Examining Normality Between X and Y",
+         x = "X Quantile",
+         y = "Y Quantile") +
+    geom_smooth(method = "lm")
+  
+  return(qq_plot)
+}
+
+```
+
+```{r Testing Q-Q Plot Function}
+
+x <- rnorm(n = 50, mean = 10, sd = 2) 
+y <- rnorm(n = 50, mean = 10, sd = 2) #creating randomized test numerical vectors
+
+my_qq_plot <- QQPlot_func(x, y)
+my_qq_plot
+```
+
