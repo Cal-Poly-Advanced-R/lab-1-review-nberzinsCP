@@ -1,0 +1,41 @@
+---
+title: "lab1-1-review-gavinemartinez"
+output: html_document
+date: "2023-04-06"
+---
+```{r libraries}
+library(here)
+library(tidyverse)
+```
+
+##Part One
+```{r}
+qq_func <- function(vec) {
+  #sort the vector in decreasing order
+  x = sort(vec, decreasing = T)
+  mean_x = mean(x)
+  sd_x = sd(x)
+  len_x = length(x)
+  
+  #create and sort a normal random vector of equal length, mean, and sd as x
+  y = sort(rnorm(len_x, mean_x, sd_x), decreasing = T)
+  
+  #return qqplot
+  return(plot(x, y, main = 'QQ-plot of x'))
+  
+}
+
+#Using real data
+qq_func(OscarsDemo$year_of_award)
+
+#Using simulated data
+qq_func(rgamma(441, shape = 2, scale = 15))
+```
+
+
+
+
+
+
+
+

@@ -1,0 +1,69 @@
+---
+title: "Part 2"
+output: html_document
+date: "2023-04-06"
+---
+## Data
+```{r}
+library(here)
+OscarsDemo = read.csv(here("Oscars-demographics-DFE.csv"))
+```
+
+1. Which movie(s) won the most unique "Big 5" awards?
+```{r}
+#dplyr
+library(dplyr)
+unique_awards <- OscarsDemo %>%
+  group_by(movie) %>%
+  summarize(num_awards = n_distinct(award))
+
+#base R
+unique_awards <- tapply(OscarsDemo$award, OscarsDemo$movie, function(x) length(unique(x)))
+unique_awards <- data.frame(movie = names(unique_awards), num_awards = unique_awards, row.names = NULL)
+
+
+```
+**By looking at the data set and clicking the header of the column for num_awards, we can see that there are quite a few movies that recieved 3 unique awards, some of them being A StreetCar Named Desire and Cabaret.**  
+
+2. Of all actresses who have won the Best Actress award, what are is the most common first name?
+```{r}
+# base R
+library(stringr)
+OSCAR2 = OscarsDemo[OscarsDemo$award == 'Best Actress',]
+fullnames = unique(OSCAR2$person)
+first_names <- str_extract(fullnames, "\\w+")
+names(sort(table(first_names), decreasing = TRUE))[1]
+
+# dplyr
+OscarsDemo2  = OscarsDemo %>%
+  select(award, person) %>%
+  filter(award == 'Best Actress')%>%
+  distinct(person) %>%
+  mutate(firstname = str_extract(person, "\\w+")) %>%
+  group_by(firstname) %>%
+  summarize(count = n()) %>%
+  arrange(desc(count)) %>%
+  slice(1) %>%
+  pull(firstname)
+OscarsDemo2
+  
+```
+**The most common first name among all actresses who have won Best Actress is Helen.**  
+
+3. What US State, or non-US country, has produced the most Oscar winners (for the awards in this dataset)?  
+```{r}
+states = str_extract(OscarsDemo$birthplace, '\\b[^,]+$')
+names(sort(table(states), decreasing = T))[1]
+
+OscarsDemo3 = OscarsDemo %>%
+  mutate(states = str_extract(birthplace, '\\b[^,]+$')) %>%
+  group_by(states) %>%
+  summarize(count = n()) %>%
+  arrange(desc(count)) %>%
+  slice(1) %>%
+  pull(states)
+OscarsDemo3  
+```
+**For he awards in this dataset, England has produced the most Oscar winners.**
+
+
